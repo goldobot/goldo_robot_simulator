@@ -108,6 +108,13 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node 
   src/robot_simulator_node.cpp
+  src/robot_simulator.cpp
+  src/simple_odometry.cpp
+  src/trajectory.cpp
+  src/propulsion_low_level_controller.cpp
+  src/propulsion_controller.cpp
+  src/pid_controller.cpp
+  src/trapezoidal_speed_profile.cpp
   )
 
 ## Rename C++ executable without prefix
@@ -122,7 +129,7 @@ set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX ""
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}  
+  ${catkin_LIBRARIES}
 )
 
 #############
