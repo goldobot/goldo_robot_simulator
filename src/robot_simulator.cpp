@@ -19,6 +19,10 @@ void RobotSimulator::setMotorsEnable(bool enable)
 	m_motors_enable = enable;
 }
 
+std::tuple<float, float> RobotSimulator::getMotorsPwm()
+{
+	return std::make_tuple(m_left_pwm, m_right_pwm);	
+}
 void RobotSimulator::setMotorsPwm(float left, float right)
 {
 	m_left_pwm = left;

@@ -19,6 +19,7 @@ namespace goldo
 		void doStep();
 		void setConfig(const RobotSimulatorConfig& config);
 		void setMotorsEnable(bool enable);
+		std::tuple<float, float> getMotorsPwm();
 		void setMotorsPwm(float left, float right);
 		std::tuple<uint16_t, uint16_t> readEncoders() const noexcept;
 		

@@ -8,6 +8,11 @@
 #include "goldo_msgs/SetBool.h"
 #include "goldo_msgs/MotorsSetPwm.h"
 #include "goldo_msgs/PropulsionPointTo.h"
+#include "goldo_msgs/PropulsionMoveTo.h"
+#include "goldo_msgs/PropulsionExecuteTrajectory.h"
+
+#include "std_msgs/UInt32.h"
+#include "std_msgs/Float32.h"
 
 goldo::RobotSimulator robot_simulator;
 goldo::SimpleOdometry odometry;
@@ -37,6 +42,24 @@ goldo::PropulsionController propulsion_controller(&odometry);
 	  return true;
   };
   
+      bool propulsion_move_to(goldo_msgs::PropulsionMoveTo::Request &req, goldo_msgs::PropulsionMoveTo::Response &res)
+  {
+	  propulsion_controller.executeMoveTo(goldo::Vector2D{req.target.x, req.target.y}, req.speed, req.acceleration, req.decceleration);
+	  return true;
+  };
+  
+        bool propulsion_execute_trajectory(goldo_msgs::PropulsionExecuteTrajectory::Request &req, goldo_msgs::PropulsionExecuteTrajectory::Response &res)
+  {
+	  std::vector<goldo::Vector2D> points;
+	  for(auto pt : req.trajectory.points)
+	  {
+		  points.push_back(goldo::Vector2D{pt.x, pt.y});
+	  };
+	  propulsion_controller.executeTrajectory(points.data(), points.size(), req.speed, req.acceleration, req.decceleration);
+	  return true;
+  };
+
+  
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "goldo_robot_simulator");
@@ -45,7 +68,8 @@ int main(int argc, char **argv)
   
   
   ros::Publisher odometry_pub = n.advertise<goldo_msgs::RobotPose>("stm32/odometry", 1000);
-  
+  ros::Publisher propulsion_state_pub = n.advertise<std_msgs::UInt32>("stm32/propulsion/state", 1000);
+  ros::Publisher motors_pwm_left_pub = n.advertise<std_msgs::Float32>("stm32/motors/pwm_left", 1000);
   
   
   ros::ServiceServer service1 = n.advertiseService("stm32/motors/set_enable", set_motors_enable);
@@ -54,7 +78,8 @@ int main(int argc, char **argv)
   ros::ServiceServer service3 = n.advertiseService("stm32/propulsion/rotation", set_propulsion_enable);
   ros::ServiceServer service4 = n.advertiseService("stm32/propulsion/translation", set_propulsion_enable);
   ros::ServiceServer service6 = n.advertiseService("stm32/propulsion/point_to", propulsion_point_to);
-
+  ros::ServiceServer service7 = n.advertiseService("stm32/propulsion/move_to", propulsion_move_to);
+  ros::ServiceServer service8 = n.advertiseService("stm32/propulsion/execute_trajectory", propulsion_execute_trajectory);
 
   goldo::RobotSimulatorConfig simulator_config;
   simulator_config.speed_coeff = 1.7f;
@@ -72,6 +97,43 @@ int main(int argc, char **argv)
   odometry_config.encoder_period = 8192;
   
   odometry.setConfig(odometry_config);
+  
+  goldo::PropulsionControllerConfig propulsion_controller_config;
+  memset(&propulsion_controller_config, 0, sizeof(propulsion_controller_config));
+  
+  
+  goldo::PropulsionLowLevelControllerConfig llc;
+  goldo::PIDConfig pid1;
+  
+  pid1.period=1e-3f;
+	pid1.kp=100;
+	pid1.ki=1;
+	pid1.kd=0;
+	pid1.feed_forward=0.5f;
+	pid1.lim_iterm=0.5;
+	pid1.lim_dterm=0;
+	pid1.min_output=-1.0f;
+	pid1.max_output=1.0f;
+		
+  llc.speed_pid_config = pid1;
+  llc.longi_pid_config = pid1;
+  llc.yaw_rate_pid_config = pid1;
+  llc.yaw_pid_config = pid1;
+  
+  propulsion_controller_config.low_level_config_static = llc;
+  propulsion_controller_config.low_level_config_cruise = llc;
+  propulsion_controller_config.low_level_config_rotate = llc;
+  
+  propulsion_controller_config.lookahead_distance = 0.1f;
+  propulsion_controller_config.lookahead_time = 0.1f;
+  propulsion_controller_config.static_pwm_limit = 1.0f;
+  propulsion_controller_config.cruise_pwm_limit = 1.0f;
+  
+  
+  
+  
+  propulsion_controller.setConfig(propulsion_controller_config);
+  
   
   {
 	  auto encoder_values = robot_simulator.readEncoders();
@@ -110,6 +172,20 @@ int main(int argc, char **argv)
 	//std_msgs::String msg;
 	//msg.data = "hello world";	
 	//raw_message_pub.publish(msg);
+	
+	if(tick % 100 == 0)
+	{
+		std_msgs::UInt32 msg;
+		msg.data = static_cast<uint32_t>(propulsion_controller.state());
+		propulsion_state_pub.publish(msg);
+		
+		{
+			std_msgs::Float32 msg;
+			msg.data = std::get<0>(robot_simulator.getMotorsPwm());
+			motors_pwm_left_pub.publish(msg);
+		}
+		
+	}
 	
     ros::spinOnce();
     loop_rate.sleep();
