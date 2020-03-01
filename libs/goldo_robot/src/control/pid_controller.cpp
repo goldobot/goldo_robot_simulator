@@ -1,4 +1,4 @@
-#include "pid_controller.hpp"
+#include "goldo/control/pid_controller.hpp"
 
 using namespace goldo;
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "geometry.hpp"
-#include "pid_controller.hpp"
-#include "propulsion_controller_config.hpp"
+#include "goldo/geometry/geometry.hpp"
+#include "goldo/control/pid_controller.hpp"
+#include "goldo/control/propulsion_controller_config.hpp"
 #include <cstdint>
 
 

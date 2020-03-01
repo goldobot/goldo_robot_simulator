@@ -1,4 +1,4 @@
-#include "trajectory_buffer.hpp"
+#include "goldo/geometry/trajectory.hpp"
 #include <cmath>
 
 using namespace goldo;

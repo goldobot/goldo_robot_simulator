@@ -2,8 +2,8 @@
 
 #include "goldo_msgs/RobotPose.h"
 #include "robot_simulator.hpp"
-#include "simple_odometry.hpp"
-#include "propulsion_controller.hpp"
+#include "goldo/odometry/simple_odometry.hpp"
+#include "goldo/control/propulsion_controller.hpp"
 
 #include "goldo_msgs/SetBool.h"
 #include "goldo_msgs/MotorsSetPwm.h"

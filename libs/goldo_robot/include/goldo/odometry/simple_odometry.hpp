@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
-#include "geometry.hpp"
-#include "odometry_config.hpp"
+#include "goldo/geometry/geometry.hpp"
+#include "goldo/odometry/odometry_config.hpp"
 
 namespace goldo
 {

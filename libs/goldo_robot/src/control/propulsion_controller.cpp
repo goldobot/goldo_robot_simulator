@@ -1,5 +1,5 @@
-#include "propulsion_controller.hpp"
-#include "simple_odometry.hpp"
+#include "goldo/control/propulsion_controller.hpp"
+#include "goldo/odometry/simple_odometry.hpp"
 using namespace goldo;
 
 #include <algorithm>

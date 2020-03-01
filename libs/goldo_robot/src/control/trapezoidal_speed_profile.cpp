@@ -1,4 +1,4 @@
-#include "trapezoidal_speed_profile.hpp"
+#include "goldo/control/trapezoidal_speed_profile.hpp"
 #include <cmath>
 
 using namespace goldo;

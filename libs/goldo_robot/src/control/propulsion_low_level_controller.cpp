@@ -1,4 +1,4 @@
-#include "propulsion_low_level_controller.hpp"
+#include "goldo/control/propulsion_low_level_controller.hpp"
 #include <cmath>
 
 namespace goldo {

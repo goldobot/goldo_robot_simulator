@@ -1,10 +1,9 @@
 #pragma once
-#include "geometry.hpp"
-#include "pid_controller.hpp"
-#include "trapezoidal_speed_profile.hpp"
-#include "trajectory_buffer.hpp"
-#include "propulsion_controller_config.hpp"
-#include "propulsion_low_level_controller.hpp"
+#include "goldo/geometry/geometry.hpp"
+#include "goldo/control/trapezoidal_speed_profile.hpp"
+#include "goldo/geometry/trajectory.hpp"
+#include "goldo/control/propulsion_controller_config.hpp"
+#include "goldo/control/propulsion_low_level_controller.hpp"
 
 #include <cstdint>
 

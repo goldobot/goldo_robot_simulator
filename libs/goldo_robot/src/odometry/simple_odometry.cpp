@@ -1,4 +1,4 @@
-#include "simple_odometry.hpp"
+#include "goldo/odometry/simple_odometry.hpp"
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstring>
