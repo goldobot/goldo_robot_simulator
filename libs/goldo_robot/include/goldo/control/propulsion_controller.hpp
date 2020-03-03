@@ -11,8 +11,7 @@
 namespace goldo
 {
 	class SimpleOdometry;
-	class TrajectoryBuffer;
-
+	
 	struct PropulsionConfiguration
 	{
 		float lookahead_distance;
@@ -117,7 +116,7 @@ namespace goldo
 		float m_pwm_limit{1.0f};
 
 		// \todo should split management of parametrized trajectory in separate class
-		TrajectoryBuffer m_trajectory_buffer;
+		Trajectory m_trajectory;
 		float m_begin_yaw; // yaw at beginning of current PointTo command
 		TrapezoidalSpeedProfile m_speed_profile;
 

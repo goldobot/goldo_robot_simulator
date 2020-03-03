@@ -70,7 +70,9 @@ int main(int argc, char **argv)
   ros::Publisher odometry_pub = n.advertise<goldo_msgs::RobotPose>("stm32/odometry", 1000);
   ros::Publisher propulsion_state_pub = n.advertise<std_msgs::UInt32>("stm32/propulsion/state", 1000);
   ros::Publisher motors_pwm_left_pub = n.advertise<std_msgs::Float32>("stm32/motors/pwm_left", 1000);
-  
+  ros::Publisher motors_pwm_right_pub = n.advertise<std_msgs::Float32>("stm32/motors/pwm_right", 1000);
+  ros::Publisher gpio_pub = n.advertise<std_msgs::UInt32>("stm32/gpio", 1000);
+  ros::Publisher sensors_pub = n.advertise<std_msgs::UInt32>("stm32/sensors", 1000);
   
   ros::ServiceServer service1 = n.advertiseService("stm32/motors/set_enable", set_motors_enable);
   ros::ServiceServer service5 = n.advertiseService("stm32/motors/set_pwm", motors_set_pwm);

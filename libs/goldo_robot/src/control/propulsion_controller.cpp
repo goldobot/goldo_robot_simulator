@@ -173,24 +173,24 @@ void PropulsionController::updateTargetPositions()
 	float t = (m_time_base_ms - m_command_begin_time) * 1e-3f;
 	float parameter, speed, accel;
 	m_speed_profile.compute(t,&parameter,&speed,&accel);
-	parameter = std::min(parameter, m_trajectory_buffer.max_parameter());
+	parameter = std::min(parameter, m_trajectory.maxParameter());
 
 	// Compute position of lookahead point in front of current position
 	float lookahead_distance = m_config.lookahead_distance + fabsf(speed) * m_config.lookahead_time;
 	float lookahead_parameter = parameter + lookahead_distance;
 
 	// Compute target position
-	auto target_point = m_trajectory_buffer.compute_point(parameter);
+	auto target_point = m_trajectory.computePoint(parameter);
 	m_target_pose.position = target_point.position;
 
 	// Compute position of lookahead point
 	// Extend the trajectory past last point if necessary
-	if(lookahead_parameter <= m_trajectory_buffer.max_parameter())
+	if(lookahead_parameter <= m_trajectory.maxParameter())
 	{
-		m_lookahead_position = m_trajectory_buffer.compute_point(lookahead_parameter).position;
+		m_lookahead_position = m_trajectory.computePoint(lookahead_parameter).position;
 	} else
 	{
-		auto end_point = m_trajectory_buffer.compute_point(m_trajectory_buffer.max_parameter());
+		auto end_point = m_trajectory.computePoint(m_trajectory.maxParameter());
 		m_lookahead_position.x = end_point.position.x + lookahead_distance * end_point.tangent.x;
 		m_lookahead_position.y = end_point.position.y + lookahead_distance * end_point.tangent.y;
 	}
@@ -279,18 +279,18 @@ void PropulsionController::on_reposition_exit()
 void PropulsionController::initMoveCommand(float speed, float accel, float deccel)
 {
 	// Compute speed profile
-	m_speed_profile.update(m_trajectory_buffer.max_parameter(), speed, accel, deccel);
+	m_speed_profile.update(m_trajectory.maxParameter(), speed, accel, deccel);
 
 	// Compute direction by taking scalar product of current robot orientation vector with tangent of trajectory at origin
-	auto target_point = m_trajectory_buffer.compute_point(0);
+	auto target_point = m_trajectory.computePoint(0);
 	float ux = cosf(m_target_pose.yaw);
 	float uy = sinf(m_target_pose.yaw);
 	m_direction = ux * target_point.tangent.x + uy * target_point.tangent.y > 0 ? Direction::Forward : Direction::Backward;
 
 	// Compute final pose
 	{
-		float parameter = m_trajectory_buffer.max_parameter();
-		auto target_point = m_trajectory_buffer.compute_point(parameter);
+		float parameter = m_trajectory.maxParameter();
+		auto target_point = m_trajectory.computePoint(parameter);
 		m_final_pose.position = target_point.position;
 		m_final_pose.yaw = atan2f(target_point.tangent.y, target_point.tangent.x);
 		if(m_direction == Direction::Backward)
@@ -326,7 +326,7 @@ bool PropulsionController::executeTrajectory(Vector2D* points, int num_points, f
 	{
 		return false;
 	}
-	m_trajectory_buffer.push_segment(points, num_points);
+	m_trajectory.setPoints(points, num_points);
 	initMoveCommand(speed, acceleration, decceleration);
 	m_state = State::FollowTrajectory;
 	m_low_level_controller.setConfig(m_config.low_level_config_static);

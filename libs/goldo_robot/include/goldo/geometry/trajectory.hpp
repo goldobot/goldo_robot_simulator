@@ -1,47 +1,32 @@
 #pragma once
-#include "geometry.hpp"
+#include <goldo/geometry/geometry.hpp>
 
+namespace goldo {
 
-#include <cstdint>
+struct TrajectoryPoint {
+  Vector2D position;
+  Vector2D tangent;
+  float speed;
+  float curvature;
+};
 
-namespace goldo
-{
-	class TrajectoryBuffer;
+class Trajectory {
+ public:
+  Trajectory();
 
-	struct TrajectoryPoint
-		{
-			Vector2D position;
-			Vector2D tangent;
-		};
+  void clear();
+  void setPoints(Vector2D* points, float* knots, unsigned num_points);
+  void setPoints(Vector2D* points, unsigned num_points);
 
+  float minParameter() const;
+  float maxParameter() const;
 
-	class TrajectoryBuffer
-	{
-	public:
-		TrajectoryBuffer();
+  //! \brief compute position of point on current segment
+  TrajectoryPoint computePoint(float parameter) const;
 
-		void clear();
-		int num_segments() const;
-		bool push_segment(Vector2D* points, unsigned num_points);
-		void pop_segment();
-
-		//! \brief compute position of point on current segment
-		TrajectoryPoint compute_point(float parameter) const;
-		float min_parameter() const;
-		float max_parameter() const;
-
-	private:
-		// Trajectory control points
-		Vector2D m_control_points[32];
-
-		// Curve parameters of control points
-		float m_knot_parameters[32];
-
-		uint16_t m_buffer_size;
-		uint16_t m_num_segments;
-
-		uint16_t m_current_first_index;
-		uint16_t m_current_last_index;
-		uint16_t m_last_end_index;
-	};
-}
+ private:
+  Vector2D mControlPoints[32];
+  float mKnots[36];
+  unsigned mNumPoints;
+};
+}  // namespace goldobot
