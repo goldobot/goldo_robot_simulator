@@ -14,6 +14,11 @@ void RobotSimulator::setConfig(const RobotSimulatorConfig& config)
 	m_config = config;
 }
 
+bool RobotSimulator::getMotorsEnable() const noexcept
+{
+	return m_motors_enable;
+}
+
 void RobotSimulator::setMotorsEnable(bool enable)
 {
 	m_motors_enable = enable;
