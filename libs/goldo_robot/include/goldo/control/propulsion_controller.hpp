@@ -4,6 +4,7 @@
 #include "goldo/geometry/trajectory.hpp"
 #include "goldo/control/propulsion_controller_config.hpp"
 #include "goldo/control/propulsion_low_level_controller.hpp"
+#include "goldo/control/speed_controller.hpp"
 
 #include <cstdint>
 
@@ -47,6 +48,13 @@ namespace goldo
 			Forward,
 			Backward
 		};
+		
+		enum class RotationDirection
+		{
+			Clockwise,
+			CounterClockwise,
+			Automatic			
+		};
 
 	public:
 		PropulsionController(SimpleOdometry* odometry);
@@ -74,8 +82,16 @@ namespace goldo
 
 		//! \brief reset robot pose. Only works if state is Inactive or Stopped. Also change odometry.
 		bool resetPose(float x, float y, float yaw);
-
+		
+		// Canonical movement commands
+		bool executeRotation(float target_yaw, RotationDirection direction, float yaw_rate, float accel, float deccel);
 		bool executeTrajectory(Vector2D* points, int num_points, float speed, float acceleration, float decceleration);
+		bool executeCruise(Direction direction, float target_speed, float acceleration);
+		
+		bool setTrajectory(Vector2D* points, int num_points);
+		bool setTargetSpeed(float speed);// Can be negative to go backwards on trajectory
+		
+		// Deprecated commands		
 		bool executeRepositioning(float speed, float accel);
 		bool executePointTo(Vector2D target, float yaw_rate, float accel, float deccel);
 		bool executeMoveTo(Vector2D target, float yaw_rate, float accel, float deccel);
@@ -104,6 +120,9 @@ namespace goldo
 		SimpleOdometry* m_odometry;
 		PropulsionControllerConfig m_config;
 		LowLevelController m_low_level_controller;
+		SpeedController m_speed_controller;
+		
+		
 		RobotPose m_current_pose;
 		RobotPose m_target_pose;
 		RobotPose m_final_pose; // Pose desired at the end of current command
